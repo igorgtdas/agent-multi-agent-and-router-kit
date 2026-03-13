@@ -1,15 +1,12 @@
 import uuid
-
-# Atualize os imports abaixo quando seus agentes existirem em agents/
-from agents.router_agent import RouterAgent
+from typing import Any
 
 
 def _new_thread_id() -> str:
     return f"user_{uuid.uuid4().hex[:8]}"
 
 
-def run_chat() -> None:
-    agent = RouterAgent()
+def run_chat(agent: Any) -> None:
     thread_id = _new_thread_id()
 
     print("Chat iniciado. Use /clean para reiniciar e /exit para sair.")
@@ -41,4 +38,6 @@ def run_chat() -> None:
 
 
 if __name__ == "__main__":
-    run_chat()
+    raise SystemExit(
+        "Execute via main.py para garantir o RouterAgent como entrypoint."
+    )

@@ -19,6 +19,7 @@ Este repositorio oferece uma base minima para:
 - `templates/tools/`: templates de tools
 - `core/` e `tools/`: base minima usada pelos templates
 - `chat/`: exemplo de chat para orquestrar via RouterAgent
+- `api/`: exemplo de API FastAPI com RouterAgent como entrypoint
 
 ### Como usar os templates
 1) Copie o template desejado para o seu projeto em `agents/` ou `tools/`.
@@ -31,6 +32,7 @@ Este repositorio oferece uma base minima para:
 - Use o prefixo `tool_` no nome das tools (ex: `tool_search`, `tool_sql_query`).
 - Centralize o roteamento no `RouterAgent` e mantenha o mapeamento `ROUTE_TO_AGENT` atualizado.
 - Evite logica de IO dentro dos agentes; delegue para tools dedicadas.
+- Garanta que o RouterAgent seja a unica porta de entrada em CLI, chat e API.
 
 ### Guia rapido: como construir um agente
 1) Crie o arquivo do agente em `agents/` a partir de um template.
@@ -40,17 +42,22 @@ Este repositorio oferece uma base minima para:
 5) Adicione o agente ao `RouterAgent` e atualize o roteamento.
 
 ### Executar o exemplo
-O `chat/chat.py` assume que existe um `agents/router_agent.py` com `route_and_run`.
+O `chat/chat.py` recebe o agente instanciado pelo entrypoint.
+Isso garante que o RouterAgent seja sempre o primeiro a rodar.
 
-Para rodar:
-```
-python -m chat.chat
-```
-
-Se preferir, rode o entrypoint simples:
+Para rodar via CLI:
 ```
 python main.py
 ```
+
+Para rodar via API (FastAPI):
+```
+uvicorn api.app:app --reload
+```
+
+Endpoint:
+- `POST /chat` usa exclusivamente `RouterAgent.route_and_run()`
+- Header obrigatório: `X-API-Key` (valor definido em `API_KEY`)
 
 ### Dependencias (recomendado)
 ```
@@ -97,6 +104,7 @@ This repository provides a minimal base to:
 - `templates/tools/`: tool templates
 - `core/` and `tools/`: minimal base used by templates
 - `chat/`: chat example orchestrated by RouterAgent
+- `api/`: FastAPI example with RouterAgent as entrypoint
 
 ### How to use the templates
 1) Copy the desired template into `agents/` or `tools/`.
@@ -109,6 +117,7 @@ This repository provides a minimal base to:
 - Use the `tool_` prefix for tool names (e.g., `tool_search`, `tool_sql_query`).
 - Keep routing centralized in `RouterAgent` and maintain `ROUTE_TO_AGENT`.
 - Avoid IO logic inside agents; delegate to dedicated tools.
+- Ensure RouterAgent is the single entrypoint for CLI, chat, and API.
 
 ### Quick guide: build an agent
 1) Create the agent file in `agents/` from a template.
@@ -118,17 +127,22 @@ This repository provides a minimal base to:
 5) Add the agent to `RouterAgent` and update routing.
 
 ### Run the example
-`chat/chat.py` expects an `agents/router_agent.py` with `route_and_run`.
+`chat/chat.py` receives the agent instantiated by the entrypoint.
+This guarantees RouterAgent runs first.
 
-Run:
-```
-python -m chat.chat
-```
-
-Or use the simple entrypoint:
+Run via CLI:
 ```
 python main.py
 ```
+
+Run via API (FastAPI):
+```
+uvicorn api.app:app --reload
+```
+
+Endpoint:
+- `POST /chat` uses only `RouterAgent.route_and_run()`
+- Required header: `X-API-Key` (value set in `API_KEY`)
 
 ### Dependencies (recommended)
 ```

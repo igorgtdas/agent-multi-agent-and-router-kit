@@ -15,10 +15,22 @@ def tool_template(runtime: ToolRuntime[Context], param: str) -> str:
         {"tool": "tool_template", "input": {"param": param}},
         CONFIG,
     )
-    output = f"OK: {param} (user_id={runtime.context.user_id})"
-    log_event(
-        "tool_result",
-        {"tool": "tool_template", "output": output},
-        CONFIG,
-    )
-    return output
+    try:
+        output = f"OK: {param} (user_id={runtime.context.user_id})"
+        log_event(
+            "tool_result",
+            {"tool": "tool_template", "output": output},
+            CONFIG,
+        )
+        return output
+    except Exception:
+        error_payload = {
+            "success": False,
+            "error_message": "erro de conexão com API",
+        }
+        log_event(
+            "tool_result",
+            {"tool": "tool_template", "output": error_payload},
+            CONFIG,
+        )
+        return error_payload
