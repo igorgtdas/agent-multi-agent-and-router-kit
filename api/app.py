@@ -2,12 +2,15 @@ import os
 import uuid
 from typing import Any
 
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from pydantic import BaseModel, Field
 
 # Atualize o import abaixo quando seus agentes existirem em agents/
 from agents.router_agent import RouterAgent
 from core.observability import to_jsonable
+
+load_dotenv()
 
 
 def _new_thread_id() -> str:

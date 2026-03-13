@@ -39,7 +39,10 @@ class ResponseFormat:
 
 
 class AgentTemplate:
-    def __init__(self):
+    def __init__(self, use_memory: bool = False, window_size: int = 3):
+        self._use_memory = use_memory
+        self._window_size = window_size
+        self._history: dict[str, list[dict[str, str]]] = {}
         self._model = init_chat_model(
             CONFIG.llm_model,
             model_provider=CONFIG.llm_provider,
@@ -71,14 +74,33 @@ class AgentTemplate:
             CONFIG,
         )
         response = self._agent.invoke(
-            {"messages": [{"role": "user", "content": question}]},
+            {"messages": self._build_messages(thread_id, question)},
             config=config,
             context=Context(user_id=thread_id),
         )
         structured = response["structured_response"]
+        self._record_history(thread_id, question, structured)
         log_event(
             "agent_response",
             {"thread_id": thread_id, "response": to_jsonable(structured)},
             CONFIG,
         )
         return structured
+
+    def _build_messages(self, thread_id: str, question: str) -> list[dict[str, str]]:
+        user_message = {"role": "user", "content": question}
+        if not self._use_memory or self._window_size <= 0:
+            return [user_message]
+        history = self._history.get(thread_id, [])
+        return history[-self._window_size :] + [user_message]
+
+    def _record_history(self, thread_id: str, question: str, structured) -> None:
+        if not self._use_memory or self._window_size <= 0:
+            return
+        assistant_text = getattr(structured, "agent_response", str(structured))
+        new_entries = [
+            {"role": "user", "content": question},
+            {"role": "assistant", "content": assistant_text},
+        ]
+        history = self._history.get(thread_id, [])
+        self._history[thread_id] = (history + new_entries)[-self._window_size :]

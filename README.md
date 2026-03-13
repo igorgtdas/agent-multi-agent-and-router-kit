@@ -33,6 +33,7 @@ Este repositorio oferece uma base minima para:
 - Centralize o roteamento no `RouterAgent` e mantenha o mapeamento `ROUTE_TO_AGENT` atualizado.
 - Evite logica de IO dentro dos agentes; delegue para tools dedicadas.
 - Garanta que o RouterAgent seja a unica porta de entrada em CLI, chat e API.
+- Ative memoria por agente apenas quando necessario para reduzir custo e latencia.
 
 ### Guia rapido: como construir um agente
 1) Crie o arquivo do agente em `agents/` a partir de um template.
@@ -62,6 +63,16 @@ Endpoint:
 ### Dependencias (recomendado)
 ```
 python -m pip install langchain langgraph langchain-openai langsmith python-dotenv
+```
+
+### Memoria por agente (opcional)
+Cada agente aceita `use_memory` e `window_size` no construtor. Por padrao a
+memoria fica desativada.
+
+Exemplo:
+```
+router = RouterAgent(use_memory=True, window_size=3)
+agent = MyAgent(use_memory=True, window_size=2)
 ```
 
 ### Sugestao de projeto basico (apenas em Markdown)
@@ -118,6 +129,7 @@ This repository provides a minimal base to:
 - Keep routing centralized in `RouterAgent` and maintain `ROUTE_TO_AGENT`.
 - Avoid IO logic inside agents; delegate to dedicated tools.
 - Ensure RouterAgent is the single entrypoint for CLI, chat, and API.
+- Enable per-agent memory only when needed to control cost and latency.
 
 ### Quick guide: build an agent
 1) Create the agent file in `agents/` from a template.
@@ -147,6 +159,16 @@ Endpoint:
 ### Dependencies (recommended)
 ```
 python -m pip install langchain langgraph langchain-openai langsmith python-dotenv
+```
+
+### Per-agent memory (optional)
+Each agent accepts `use_memory` and `window_size` in the constructor. Memory is
+disabled by default.
+
+Example:
+```
+router = RouterAgent(use_memory=True, window_size=3)
+agent = MyAgent(use_memory=True, window_size=2)
 ```
 
 ### Basic project suggestion (Markdown only)
