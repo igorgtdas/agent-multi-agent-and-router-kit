@@ -92,7 +92,8 @@ class AgentTemplate:
         if not self._use_memory or self._window_size <= 0:
             return [user_message]
         history = self._history.get(thread_id, [])
-        return history[-self._window_size :] + [user_message]
+        max_messages = self._window_size * 2
+        return history[-max_messages:] + [user_message]
 
     def _record_history(self, thread_id: str, question: str, structured) -> None:
         if not self._use_memory or self._window_size <= 0:
@@ -103,4 +104,5 @@ class AgentTemplate:
             {"role": "assistant", "content": assistant_text},
         ]
         history = self._history.get(thread_id, [])
-        self._history[thread_id] = (history + new_entries)[-self._window_size :]
+        max_messages = self._window_size * 2
+        self._history[thread_id] = (history + new_entries)[-max_messages:]
